@@ -2,7 +2,6 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-
 /* If you know the sea level pressure, the accuracy improves a lot
 #define SEALEVELPRESSURE_HPA (1013.25) */
 
@@ -13,10 +12,17 @@ Adafruit_BME280 bme2;
 void setup() {
   Serial.begin(9600);
 /* assuming I2C address set is 0x76. If you are using 0x77, update 0x77 as the I2C address  */
+  while(!Serial);    // time to get serial running
+    Serial.println(F("BME280 test"));
   if (!bme.begin(0x76)) {
     Serial.println("No BME280 device found!");
     while (1);
+  }else if (!bme.begin(0x77)) {
+    Serial.println("No BME280 device found!");
+    while (1);
   }
+  bme.begin(0x77); // address = 0x77 (default)
+  bme2.begin(0x76); // address = 0x76 
 }
 
 void loop() {
@@ -35,14 +41,8 @@ void loop() {
 /*
   Serial.print("Pressure in hPa = ");
   Serial.println(bme.readPressure() / 100.0F);
-
-/*
-  Serial.println("Altitude in m = ");
-  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-
-  Serial.print("Humidity in %RH = ");
-  Serial.println(bme.readHumidity());
 */
+
   Serial.println();
   delay(5000);
 }
