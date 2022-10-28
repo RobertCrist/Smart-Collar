@@ -15,8 +15,6 @@ BLEByteCharacteristic tempCharacteristic("2A57", BLERead | BLEWrite);
 void setup() {
   Serial.begin(9600);
 /* assuming I2C address set is 0x76. If you are using 0x77, update 0x77 as the I2C address  */
-  while(!Serial);    // time to get serial running
-    Serial.println(F("BME280 test"));
   if (!bme.begin(0x76)) {
     Serial.println("No BME280 device found!");
     while (1);
