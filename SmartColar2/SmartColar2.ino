@@ -36,7 +36,7 @@ Adafruit_BME280 bme2;
 
 void setup() {
   Serial.begin(9600);    // initialize serial communication
-  while (!Serial);
+  //while (!Serial);
   bme.begin(0x77); // address = 0x77 (default)
   bme2.begin(0x76); // address = 0x76 
   pinMode(LED_BUILTIN, OUTPUT); // initialize the built-in LED pin to indicate when a central is connected
@@ -86,7 +86,7 @@ void loop() {
     while (central.connected()) {
       long currentMillis = millis();
       // if 200ms have passed, check the battery level:
-      if (currentMillis - previousMillis >= 200) {
+      if (currentMillis - previousMillis >= 10000) {
         previousMillis = currentMillis;
         updateBatteryLevel();
       }
