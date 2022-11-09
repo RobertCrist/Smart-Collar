@@ -33,13 +33,13 @@ void setup() {
     while (1);
   }
   
-  // if (!bme.begin(0x76)) {
-  //   Serial.println("No BME280 device found!");
-  //   while (1);
-  // }else if (!bme.begin(0x77)) {
-  //   Serial.println("No BME280 device found!");
-  //   while (1);
-  // }
+  if (!bme.begin(0x76)) {
+    Serial.println("No BME280 device found!");
+    while (1);
+  }else if (!bme.begin(0x77)) {
+    Serial.println("No BME280 device found!");
+    while (1);
+  }
   Serial.println("Starting BLE");
 
   BLE.setLocalName("SmartCollar");
@@ -67,9 +67,9 @@ void loop() {
     while (central.connected()) {
     long currMillis = millis();
 
-      if(currMillis - prevMillis >= 1000){
+      if(currMillis - prevMillis >= 5000){
         prevMillis = millis();
-        test();
+        uodateTemp();
         
       }
     }  
@@ -84,13 +84,15 @@ void loop() {
 void updateTemps() {
   Serial.print("Temperature in deg F = ");
   double cel = bme.readTemperature();
-  double temp = (cel*9/5) + 32;
-  Serial.println(temp);
+  int internalTempData = (int)((cel*9/5) + 32);
+  Serial.println(internalTempData);
+  intrnalTemp.writeValue(internalTempData)
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
-  double temp2 = (cel2*9/5) + 32;
-  Serial.println(temp2);
+  double externalTempData = (int)((cel2*9/5) + 32);
+  Serial.println(externalTempData);
+  externalTemp.writeValue(externalTempData);
 }
 
 void test(){
