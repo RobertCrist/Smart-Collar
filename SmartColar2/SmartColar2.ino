@@ -21,10 +21,10 @@
 #include <ArduinoBLE.h>
 
  // Bluetooth® Low Energy Battery Service
-BLEService batteryService("180F");
+BLEService tempService("180F");
 
 // Bluetooth® Low Energy Battery Level Characteristic
-BLEUnsignedCharCharacteristic batteryLevelChar("2A19",  // standard 16-bit characteristic UUID
+BLEUnsignedCharCharacteristic tempChar("2A19",  // standard 16-bit characteristic UUID
     BLERead | BLENotify); // remote clients will be able to get notifications if this characteristic changes
 
 int oldBatteryLevel = 0;  // last battery level reading from analog input
@@ -53,11 +53,11 @@ void setup() {
      and can be used by remote devices to identify this Bluetooth® Low Energy device
      The name can be changed but maybe be truncated based on space left in advertisement packet
   */
-  BLE.setLocalName("BatteryMonitor");
-  BLE.setAdvertisedService(batteryService); // add the service UUID
-  batteryService.addCharacteristic(batteryLevelChar); // add the battery level characteristic
-  BLE.addService(batteryService); // Add the battery service
-  batteryLevelChar.writeValue(oldBatteryLevel); // set initial value for this characteristic
+  BLE.setLocalName("SmartCollar");
+  BLE.setAdvertisedService(tempService); 
+  tempService.addCharacteristic(tempChar);
+  BLE.addService(tempService); 
+  tempChar.writeValue(oldBatteryLevel); // set initial value for this characteristic
 
   /* Start advertising Bluetooth® Low Energy.  It will start continuously transmitting Bluetooth® Low Energy
      advertising packets and will be visible to remote Bluetooth® Low Energy central devices
