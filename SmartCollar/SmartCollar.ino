@@ -69,7 +69,7 @@ void loop() {
 
       if(currMillis - prevMillis >= 5000){
         prevMillis = millis();
-        uodateTemp();
+        updateTemps();
         
       }
     }  
@@ -86,7 +86,7 @@ void updateTemps() {
   double cel = bme.readTemperature();
   int internalTempData = (int)((cel*9/5) + 32);
   Serial.println(internalTempData);
-  intrnalTemp.writeValue(internalTempData)
+  internalTemp.writeValue(internalTempData);
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
@@ -100,5 +100,3 @@ void test(){
   Serial.println(rand);
   internalTemp.writeValue(rand);  
 }
-
-
