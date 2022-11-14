@@ -11,8 +11,8 @@ Adafruit_BME280 bme2;
 
 BLEService tempService("180A"); // BLE LED Service
 
-BLEIntCharacteristic internalTemp("2A19", BLEWrite | BLENotify);
-BLEIntCharacteristic externalTemp("2A20", BLEWrite | BLENotify);
+BLEIntCharacteristic internalTemp("2A13", BLEWrite | BLENotify);
+BLEIntCharacteristic externalTemp("5A20", BLEWrite | BLENotify);
 
 long prevMillis = 0;
 int dogSafeTemp = 0;
@@ -33,18 +33,20 @@ void setup() {
     while (1);
   }
   
-  if (!bme.begin(0x76)) {
-    Serial.println("No BME280 device found!");
-    while (1);
-  }else if (!bme.begin(0x77)) {
-    Serial.println("No BME280 device found!");
-    while (1);
-  }
+  // if (!bme.begin(0x76)) {
+  //   Serial.println("No BME280 device found!");
+  //   while (1);
+  // }else if (!bme.begin(0x77)) {
+  //   Serial.println("No BME280 device found!");
+  //   while (1);
+  // }
+
   Serial.println("Starting BLE");
 
   BLE.setLocalName("SmartCollar");
   BLE.setAdvertisedService(tempService);
   tempService.addCharacteristic(internalTemp);
+  tempService.addCharacteristic(externalTemp);
   BLE.addService(tempService);
   internalTemp.writeValue(dogSafeTemp); // set initial value for this characteristic
 
@@ -69,7 +71,8 @@ void loop() {
 
       if(currMillis - prevMillis >= 5000){
         prevMillis = millis();
-        uodateTemp();
+        //updateTemp();
+        test();
         
       }
     }  
@@ -86,7 +89,7 @@ void updateTemps() {
   double cel = bme.readTemperature();
   int internalTempData = (int)((cel*9/5) + 32);
   Serial.println(internalTempData);
-  intrnalTemp.writeValue(internalTempData)
+  internalTemp.writeValue(internalTempData);
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
@@ -97,8 +100,14 @@ void updateTemps() {
 
 void test(){
   int rand = random(50, 60);
+  Serial.print("Internal: ");
   Serial.println(rand);
   internalTemp.writeValue(rand);  
+
+  int rand2 = random(90, 100);
+  Serial.print("External: ");
+  Serial.println(rand2);
+  externalTemp.writeValue(rand2);  
 }
 
 
