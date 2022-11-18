@@ -9,10 +9,10 @@
 Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
-BLEService tempService("180A"); // BLE LED Service
+BLEService tempService("98a06868-7df4-431d-b940-8d92656e7893"); // BLE LED Service
 
-BLEIntCharacteristic internalTemp("2A13", BLEWrite | BLENotify);
-BLEIntCharacteristic externalTemp("5A20", BLEWrite | BLENotify);
+BLEIntCharacteristic internalTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
+BLEIntCharacteristic externalTemp("3285a9d7-857b-4233-809e-67e077a0366c", BLEWrite | BLENotify);
 
 long prevMillis = 0;
 int dogSafeTemp = 0;
@@ -58,7 +58,7 @@ void setup() {
 void loop() {
 
   BLEDevice central = BLE.central();
-  
+  bool sel = false;
   if (central) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
@@ -69,11 +69,11 @@ void loop() {
     while (central.connected()) {
     long currMillis = millis();
 
-      if(currMillis - prevMillis >= 5000){
+      if(currMillis - prevMillis >= 1000){
         prevMillis = millis();
         //updateTemp();
-        test();
-        
+        test(sel);
+        sel = !sel;
       }
     }  
   
@@ -98,16 +98,28 @@ void updateTemps() {
   externalTemp.writeValue(externalTempData);
 }
 
-void test(){
-  int rand = random(50, 60);
+void test(bool sel){
+  int rand = random(0, 120);
+  int rand2 = random(0, 120);
+  
+  int combine = rand + rand2 * 256;
   Serial.print("Internal: ");
   Serial.println(rand);
-  internalTemp.writeValue(rand);  
-
-  int rand2 = random(90, 100);
   Serial.print("External: ");
   Serial.println(rand2);
-  externalTemp.writeValue(rand2);  
+  Serial.print("Combine: ");
+  Serial.println(combine);
+  Serial.println();
+  internalTemp.writeValue(combine);  
+  
+  // Serial.print("External: ");
+  // Serial.println(rand2);
+  // externalTemp.writeValue(rand2);  
+
+  
+  //   Serial.println("Internal: 9652");
+
+  //   internalTemp.writeValue(10112);  
 }
 
 
