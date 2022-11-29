@@ -5,14 +5,17 @@
 #include <ArduinoBLE.h>
 /* If you know the sea level pressure, the accuracy improves a lot
 #define SEALEVELPRESSURE_HPA (1013.25) */
+#define LSL8 256 
 
 Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
-BLEService tempService("180A"); // BLE LED Service
+BLEService tempService("98a06868-7df4-431d-b940-8d92656e7893"); // BLE LED Service
 
-BLEIntCharacteristic internalTemp("2A19", BLEWrite | BLENotify);
-BLEIntCharacteristic externalTemp("2A20", BLEWrite | BLENotify);
+//BLEIntCharacteristic internalTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
+BLEIntCharacteristic externalTemp("3285a9d7-857b-4233-809e-67e077a0366c", BLEWrite | BLENotify);
+
+BLEIntCharacteristic combinedTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
 
 long prevMillis = 0;
 int dogSafeTemp = 0;
@@ -33,20 +36,23 @@ void setup() {
     while (1);
   }
   
-  if (!bme.begin(0x76)) {
-    Serial.println("No BME280 device found!");
-    while (1);
-  }else if (!bme.begin(0x77)) {
-    Serial.println("No BME280 device found!");
-    while (1);
-  }
+  // if (!bme.begin(0x76)) {
+  //   Serial.println("No BME280 device found!");
+  //   while (1);
+  // }else if (!bme.begin(0x77)) {
+  //   Serial.println("No BME280 device found!");
+  //   while (1);
+  // }
+
   Serial.println("Starting BLE");
 
   BLE.setLocalName("SmartCollar");
   BLE.setAdvertisedService(tempService);
-  tempService.addCharacteristic(internalTemp);
+  // tempService.addCharacteristic(internalTemp);
+  // tempService.addCharacteristic(externalTemp);
+  tempService.addCharacteristic(combinedTemp);
   BLE.addService(tempService);
-  internalTemp.writeValue(dogSafeTemp); // set initial value for this characteristic
+  //internalTemp.writeValue(dogSafeTemp); // set initial value for this characteristic
 
   BLE.advertise();
 
@@ -56,7 +62,7 @@ void setup() {
 void loop() {
 
   BLEDevice central = BLE.central();
-  
+  bool sel = false;
   if (central) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
@@ -67,10 +73,11 @@ void loop() {
     while (central.connected()) {
     long currMillis = millis();
 
-      if(currMillis - prevMillis >= 5000){
+      if(currMillis - prevMillis >= 1000){
         prevMillis = millis();
-        updateTemps();
-        
+        //updateTemp();
+        test(sel);
+        sel = !sel;
       }
     }  
   
@@ -86,17 +93,38 @@ void updateTemps() {
   double cel = bme.readTemperature();
   int internalTempData = (int)((cel*9/5) + 32);
   Serial.println(internalTempData);
-  internalTemp.writeValue(internalTempData);
+  //internalTemp.writeValue(internalTempData);
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
   double externalTempData = (int)((cel2*9/5) + 32);
   Serial.println(externalTempData);
-  externalTemp.writeValue(externalTempData);
+  //externalTemp.writeValue(externalTempData);
+
+  int combinedTempData = externalTempData * LSL8 + internalTempData;
+  combinedTemp.writeValue(combinedTempData);
 }
 
-void test(){
-  int rand = random(50, 60);
+void test(bool sel){
+  int rand = random(0, 120);
+  int rand2 = random(0, 120);
+  
+  int combine = rand + rand2 * 256;
+  Serial.print("Internal: ");
   Serial.println(rand);
-  internalTemp.writeValue(rand);  
+  Serial.print("External: ");
+  Serial.println(rand2);
+  Serial.print("Combine: ");
+  Serial.println(combine);
+  Serial.println();
+  combinedTemp.writeValue(combine);  
+  
+  // Serial.print("External: ");
+  // Serial.println(rand2);
+  // externalTemp.writeValue(rand2);  
+
+  
+  //   Serial.println("Internal: 9652");
+
+  //   internalTemp.writeValue(10112);  
 }
