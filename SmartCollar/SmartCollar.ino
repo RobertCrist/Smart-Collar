@@ -5,14 +5,17 @@
 #include <ArduinoBLE.h>
 /* If you know the sea level pressure, the accuracy improves a lot
 #define SEALEVELPRESSURE_HPA (1013.25) */
+#define LSL8 256 
 
 Adafruit_BME280 bme;
 Adafruit_BME280 bme2;
 
 BLEService tempService("98a06868-7df4-431d-b940-8d92656e7893"); // BLE LED Service
 
-BLEIntCharacteristic internalTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
+//BLEIntCharacteristic internalTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
 BLEIntCharacteristic externalTemp("3285a9d7-857b-4233-809e-67e077a0366c", BLEWrite | BLENotify);
+
+BLEIntCharacteristic combinedTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWrite | BLENotify);
 
 long prevMillis = 0;
 int dogSafeTemp = 0;
@@ -45,10 +48,11 @@ void setup() {
 
   BLE.setLocalName("SmartCollar");
   BLE.setAdvertisedService(tempService);
-  tempService.addCharacteristic(internalTemp);
-  tempService.addCharacteristic(externalTemp);
+  // tempService.addCharacteristic(internalTemp);
+  // tempService.addCharacteristic(externalTemp);
+  tempService.addCharacteristic(combinedTemp);
   BLE.addService(tempService);
-  internalTemp.writeValue(dogSafeTemp); // set initial value for this characteristic
+  //internalTemp.writeValue(dogSafeTemp); // set initial value for this characteristic
 
   BLE.advertise();
 
@@ -89,13 +93,16 @@ void updateTemps() {
   double cel = bme.readTemperature();
   int internalTempData = (int)((cel*9/5) + 32);
   Serial.println(internalTempData);
-  internalTemp.writeValue(internalTempData);
+  //internalTemp.writeValue(internalTempData);
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
   double externalTempData = (int)((cel2*9/5) + 32);
   Serial.println(externalTempData);
-  externalTemp.writeValue(externalTempData);
+  //externalTemp.writeValue(externalTempData);
+
+  int combinedTempData = externalTempData * LSL8 + internalTempData;
+  combinedTemp.writeValue(combinedTempData);
 }
 
 void test(bool sel){
@@ -110,7 +117,7 @@ void test(bool sel){
   Serial.print("Combine: ");
   Serial.println(combine);
   Serial.println();
-  internalTemp.writeValue(combine);  
+  combinedTemp.writeValue(combine);  
   
   // Serial.print("External: ");
   // Serial.println(rand2);
