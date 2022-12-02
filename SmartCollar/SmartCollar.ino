@@ -19,6 +19,9 @@ BLEIntCharacteristic combinedTemp("c860de29-0df7-4832-8c9f-cb8b6bdac985", BLEWri
 
 long prevMillis = 0;
 int dogSafeTemp = 0;
+
+int data[] = {95,96,97,98,99,100,99,98,97,96};
+
 void setup() {
   Serial.begin(9600);
   // while (!Serial);
@@ -62,7 +65,7 @@ void setup() {
 void loop() {
 
   BLEDevice central = BLE.central();
-  bool sel = false;
+  int i = 0;
   if (central) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
@@ -77,8 +80,13 @@ void loop() {
         prevMillis = millis();
         //updateTemp();
         //test(sel);
-        updateTemps();
-        sel = !sel;
+        //updateTemps();
+
+        test2(i);
+        i += 1;
+        if(i == 10){
+          i = 0;
+        }
       }
     }  
   
@@ -128,4 +136,11 @@ void test(bool sel){
   //   Serial.println("Internal: 9652");
 
   //   internalTemp.writeValue(10112);  
+}
+
+void test2(int i){
+  Serial.println(data[i]);
+
+  int combine = data[i] + (data[i] + 1) * LSL8;
+  combinedTemp.writeValue(combine);
 }
