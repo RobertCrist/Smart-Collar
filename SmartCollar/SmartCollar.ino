@@ -21,7 +21,7 @@ long prevMillis = 0;
 int dogSafeTemp = 0;
 void setup() {
   Serial.begin(9600);
-  while (!Serial);
+  // while (!Serial);
   Serial.println("Starting");
   bme.begin(0x77); // address = 0x77 (default)
   bme2.begin(0x76); // address = 0x76 
@@ -76,7 +76,8 @@ void loop() {
       if(currMillis - prevMillis >= 1000){
         prevMillis = millis();
         //updateTemp();
-        test(sel);
+        //test(sel);
+        updateTemps();
         sel = !sel;
       }
     }  
@@ -97,7 +98,7 @@ void updateTemps() {
 
   Serial.print("Temperature in deg F2 = ");
   double cel2 = bme2.readTemperature();
-  double externalTempData = (int)((cel2*9/5) + 32);
+  int externalTempData = (int)((cel2*9/5) + 32);
   Serial.println(externalTempData);
   //externalTemp.writeValue(externalTempData);
 
