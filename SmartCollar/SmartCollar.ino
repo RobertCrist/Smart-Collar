@@ -32,20 +32,19 @@ void setup() {
 /* assuming I2C address set is 0x76. If you are using 0x77, update 0x77 as the I2C address  */
 
   pinMode(LED_BUILTIN, OUTPUT); // initialize the built-in LED pin to indicate when a central is connected
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+
   Serial.println("Starting");
   if (!BLE.begin()) {
     Serial.println("starting BLE failed!");
 
     while (1);
   }
-  
-  // if (!bme.begin(0x76)) {
-  //   Serial.println("No BME280 device found!");
-  //   while (1);
-  // }else if (!bme.begin(0x77)) {
-  //   Serial.println("No BME280 device found!");
-  //   while (1);
-  // }
+
 
   Serial.println("Starting BLE");
 
@@ -66,6 +65,7 @@ void loop() {
 
   BLEDevice central = BLE.central();
   int i = 0;
+  bool sel = false;
   if (central) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
@@ -76,17 +76,12 @@ void loop() {
     while (central.connected()) {
     long currMillis = millis();
 
-      if(currMillis - prevMillis >= 1000){
+      if(currMillis - prevMillis >= 10000){
         prevMillis = millis();
         //updateTemp();
         //test(sel);
-        //updateTemps();
+        updateTemps();
 
-        test2(i);
-        i += 1;
-        if(i == 10){
-          i = 0;
-        }
       }
     }  
   
@@ -112,6 +107,21 @@ void updateTemps() {
 
   int combinedTempData = externalTempData * LSL8 + internalTempData;
   combinedTemp.writeValue(combinedTempData);
+  if((internalTempData >= 90) || (externalTempData >=90)){
+    
+    digitalWrite(5, HIGH); 
+    digitalWrite(6, HIGH);// turn the LED on (HIGH is the voltage level)
+    digitalWrite(7, HIGH);// turn the LED on (HIGH is the voltage level)
+    digitalWrite(8, HIGH);
+    digitalWrite(9, HIGH);      
+    
+  } else {
+    digitalWrite(5, LOW);  
+    digitalWrite(6, LOW); // turn the LED off by making the voltage LOW
+    digitalWrite(7, LOW);
+    digitalWrite(8, LOW);
+    digitalWrite(9, LOW);// turn the LED off by making the voltage LOW
+  }
 }
 
 void test(bool sel){
